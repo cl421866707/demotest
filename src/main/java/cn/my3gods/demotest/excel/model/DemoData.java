@@ -2,6 +2,8 @@ package cn.my3gods.demotest.excel.model;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
+import com.alibaba.excel.annotation.format.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,8 +27,12 @@ public class DemoData {
     private String string;
     @ExcelProperty(value = "日期标题", index = 1)
     private Date date;
+
+    @NumberFormat("#.##%")//格式化：百分比
     @ExcelProperty(value = "数字标题", index = 2)
     private Double doubleData;
+
+    @DateTimeFormat("yyyy年MM月dd日HH时mm分ss秒")//格式化日期
     @ExcelProperty(value = "创建时间", index = 3)
     private Date createTime;
     /**
