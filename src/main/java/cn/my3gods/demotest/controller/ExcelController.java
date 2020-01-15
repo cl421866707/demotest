@@ -1,13 +1,12 @@
 package cn.my3gods.demotest.controller;
 
 import cn.my3gods.demotest.excel.model.DemoData;
+import cn.my3gods.demotest.util.JsonUtils;
 import com.alibaba.excel.EasyExcel;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("excel/")
 public class ExcelController {
 
-    @Resource
-    private ObjectMapper objectMapper;
-
     @GetMapping("test")
     @ResponseBody
-    public String test(){
+    public String test() {
         return "???";
     }
 
@@ -72,7 +68,7 @@ public class ExcelController {
             Map<String, String> map = new HashMap<>();
             map.put("status", "failure");
             map.put("message", "下载文件失败" + e.getMessage());
-            response.getWriter().println(objectMapper.writeValueAsString(map));
+            response.getWriter().println(JsonUtils.object2Json(map));
         }
     }
 }
