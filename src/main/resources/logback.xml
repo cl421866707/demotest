@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="LOG_FILE_NAME" value="generator" />  <!--默认日志文件后缀名为log，可项目修改此处即可-->
+	<property name="LOG_HOME" value="/var/log/basic/${LOG_FILE_NAME}" />
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>[%d{MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{82} %line - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 错误日志文件 -->
+	<appender name="ErrorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}/${LOG_FILE_NAME}-error.log</file>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<!-- 设置滚动策略 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!--设置日志命名模式-->
+			<fileNamePattern>${LOG_HOME}/${LOG_FILE_NAME}-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<!--最多保留30天log-->
+			<maxHistory>30</maxHistory>
+			<!-- 超过150MB时，触发滚动策略 -->
+			<maxFileSize>150MB</maxFileSize>
+		</rollingPolicy>
+		<encoder>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{82} %line - %caller{3} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 每天滚动日志文件 -->
+	<appender name="RollingAppender"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--日志文件输出的文件名-->
+			<FileNamePattern>${LOG_HOME}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!--日志文件保留天数-->
+			<MaxHistory>15</MaxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{82} %line - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ErrorAppender" />
+		<appender-ref ref="RollingAppender" />
+	</root>
+
+	<logger name="cn.my3gods.service" level="DEBUG"/>
+	<logger name="cn.my3gods.mapper" level="DEBUG"/>
+	<logger name="cn.my3gods.controller" level="DEBUG"/>
+	<logger name="cn.my3gods" level="DEBUG"/>
+
+	<logger name="jdbc.connection" level="WARN"/>
+	<logger name="jdbc.resultset" level="WARN"/>
+	<logger name="jdbc.audit" level="WARN"/>
+	<logger name="jdbc.sqlonly" level="WARN"/>
+	<logger name="jdbc.sqltiming" level="DEBUG"/>
+
+
+</configuration>

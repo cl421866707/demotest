@@ -91,11 +91,18 @@
             <version>3.3.0</version>
         </dependency>
         <!-- log4jdbc 用于展示完整的SQL -->
+        <!--<dependency>-->
+            <!--<groupId>com.googlecode.log4jdbc</groupId>-->
+            <!--<artifactId>log4jdbc</artifactId>-->
+            <!--<version>1.2</version>-->
+        <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/p6spy/p6spy -->
         <dependency>
-            <groupId>com.googlecode.log4jdbc</groupId>
-            <artifactId>log4jdbc</artifactId>
-            <version>1.2</version>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+            <version>3.8.7</version>
         </dependency>
+
 
     </dependencies>
 

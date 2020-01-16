@@ -1,6 +1,6 @@
 package cn.my3gods.demotest.excel.listener;
 
-import cn.my3gods.demotest.excel.model.DemoData;
+import cn.my3gods.demotest.excel.model.StudentData;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.fastjson.JSON;
@@ -9,22 +9,22 @@ import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-// 有个很重要的点 DemoDataListener 不能被spring管理，要每次读取excel都要new,然后里面用到spring可以构造方法传进去
+// 有个很重要的点 DataListener 不能被spring管理，要每次读取excel都要new,然后里面用到spring可以构造方法传进去
 @Slf4j
 @Getter
-public class DemoDataListener extends AnalysisEventListener<DemoData> {
+public class DataListener extends AnalysisEventListener<StudentData> {
 
     /**
      * 每隔5条存储数据库，实际使用中可以3000条，然后清理list ，方便内存回收
      */
-    private static final int BATCH_COUNT = 5;
-    private List<DemoData> list = new ArrayList<>();
+    private static final int BATCH_COUNT = 1024;
+    private List<StudentData> list = new ArrayList<>();
 
     /**
      * 假设这个是一个DAO，当然有业务逻辑这个也可以是一个service。当然如果不用存储这个对象没用。
      */
 //    private DemoDAO demoDAO;
-    public DemoDataListener() {
+    public DataListener() {
         // 这里是demo，所以随便new一个。实际使用如果到了spring,请使用下面的有参构造函数
 //        demoDAO = new DemoDAO();
     }
@@ -34,7 +34,7 @@ public class DemoDataListener extends AnalysisEventListener<DemoData> {
      *
      * @param demoDAO
      */
-//    public DemoDataListener(DemoDAO demoDAO) {
+//    public DataListener(DemoDAO demoDAO) {
 //        this.demoDAO = demoDAO;
 //    }
 
@@ -44,7 +44,7 @@ public class DemoDataListener extends AnalysisEventListener<DemoData> {
      * @param data one row value. Is is same as {@link AnalysisContext#readRowHolder()}
      */
     @Override
-    public void invoke(DemoData data, AnalysisContext context) {
+    public void invoke(StudentData data, AnalysisContext context) {
         log.info("解析到一条数据:{}", JSON.toJSONString(data));
         list.add(data);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
@@ -70,7 +70,8 @@ public class DemoDataListener extends AnalysisEventListener<DemoData> {
      */
     private void saveData() {
         log.info("{}条数据，开始存储数据库！", list.size());
+        log.info("数据：{}", JSON.toJSONString(list));
 //        demoDAO.save(list);
-        log.info("存储数据库成功！");
+//        log.info("存储数据库成功！");
     }
 }
