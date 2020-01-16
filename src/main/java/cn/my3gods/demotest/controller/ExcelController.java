@@ -1,6 +1,9 @@
 package cn.my3gods.demotest.controller;
 
+import cn.my3gods.demotest.dto.CommonResponse;
+import cn.my3gods.demotest.excel.listener.DataListener;
 import cn.my3gods.demotest.excel.model.DemoData;
+import cn.my3gods.demotest.excel.model.StudentData;
 import cn.my3gods.demotest.util.JsonUtils;
 import com.alibaba.excel.EasyExcel;
 import java.io.IOException;
@@ -10,8 +13,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("excel/")
@@ -70,5 +75,21 @@ public class ExcelController {
             map.put("message", "下载文件失败" + e.getMessage());
             response.getWriter().println(JsonUtils.object2Json(map));
         }
+    }
+
+    /**
+     * 文件上传
+     * <p>
+     * 1. 创建excel对应的实体对象 参照{@link StudentData}
+     * <p>
+     * 2. 由于默认一行行的读取excel，所以需要创建excel一行一行的回调监听器，参照{@link DataListener}
+     * <p>
+     * 3. 直接读即可
+     */
+    @PostMapping("upload")
+    @ResponseBody
+    public CommonResponse<Void> upload(MultipartFile file) throws IOException {
+        EasyExcel.read(file.getInputStream(), StudentData.class, new DataListener()).sheet().doRead();
+        return CommonResponse.ok();
     }
 }

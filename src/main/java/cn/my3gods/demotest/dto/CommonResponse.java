@@ -36,6 +36,10 @@ public class CommonResponse<T> implements Serializable {
         this.data = data;
     }
 
+    public static <T> CommonResponse<T> ok() {
+        return new CommonResponse<>(success, "success");
+    }
+
     public static <T> CommonResponse<T> ok(String message) {
         return new CommonResponse<>(success, message);
     }

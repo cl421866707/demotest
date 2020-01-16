@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<property name="LOG_FILE_NAME" value="generator" />  <!--默认日志文件后缀名为log，可项目修改此处即可-->
+	<property name="LOG_FILE_NAME" value="demotest" />  <!--默认日志文件后缀名为log，可项目修改此处即可-->
 	<property name="LOG_HOME" value="/var/log/basic/${LOG_FILE_NAME}" />
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
