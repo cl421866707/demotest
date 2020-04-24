@@ -174,10 +174,9 @@ public class PdfUtils {
     public static boolean mergePdf(List<File> fileList, String outFilePath) {
         Document document = null;
         try {
-            int pageOffset = 0;
             List<Map<String, Object>> master = new ArrayList<>();
             PdfCopy writer = null;
-            for (int fileIndex = 0; fileIndex < fileList.size(); fileIndex++) {
+            for (int fileIndex = 0, pageOffset = 0; fileIndex < fileList.size(); fileIndex++) {
                 File pdfFile = fileList.get(fileIndex);
                 // we create a reader for a certain document
                 PdfReader reader = new PdfReader(pdfFile.getPath());
@@ -195,6 +194,7 @@ public class PdfUtils {
                 }
                 pageOffset += pdfPages;
                 log.info("There are {} pages in {}", pdfPages, pdfFile.getPath());
+
                 // init when first file
                 if (0 == fileIndex) {
                     // step 1: creation of a document-object
