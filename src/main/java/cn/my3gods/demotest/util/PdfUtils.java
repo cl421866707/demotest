@@ -1,13 +1,22 @@
 package cn.my3gods.demotest.util;
 
 import cn.my3gods.demotest.enums.FontEnum;
+import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfCopy;
+import com.lowagie.text.pdf.PdfImportedPage;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.SimpleBookmark;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -126,6 +135,98 @@ public class PdfUtils {
         } catch (DocumentException e) {
             log.error("PdfUtils.createFile DocumentException:{}", e.getMessage(), e);
         }
+        return false;
+    }
+
+    /**
+     * 合并多个pdf文件
+     *
+     * @param fileList 文件对象
+     * @param savePath 合并成的文件路径
+     * @return 成功 - true
+     */
+    public static boolean mergePdfV1(List<File> fileList, String savePath) {
+        Document document = null;
+        try {
+            document = new Document(new PdfReader(fileList.get(0).getPath()).getPageSize(1));
+            PdfCopy copy = new PdfCopy(document, new FileOutputStream(savePath));
+            document.open();
+            for (File aFileList : fileList) {
+                PdfReader reader = new PdfReader(aFileList.getPath());
+                int n = reader.getNumberOfPages();// 获得总页码
+                for (int j = 1; j <= n; j++) {
+                    document.newPage();
+                    PdfImportedPage page = copy.getImportedPage(reader, j);// 从当前Pdf,获取第j页
+                    copy.addPage(page);
+                }
+            }
+        } catch (Exception e) {
+            log.error("PdfUtils.mergePdf error:{}\n{}", e.getMessage(), e);
+            return false;
+        } finally {
+            if (document != null) {
+                document.close();
+            }
+        }
+        return true;
+    }
+
+    public static boolean mergePdf(List<File> fileList, String outFilePath) {
+        Document document = null;
+        try {
+            int pageOffset = 0;
+            List<Map<String, Object>> master = new ArrayList<>();
+            PdfCopy writer = null;
+            for (int fileIndex = 0; fileIndex < fileList.size(); fileIndex++) {
+                File pdfFile = fileList.get(fileIndex);
+                // we create a reader for a certain document
+                PdfReader reader = new PdfReader(pdfFile.getPath());
+                reader.consolidateNamedDestinations();
+                // we retrieve the total number of pages
+                int pdfPages = reader.getNumberOfPages();
+
+                @SuppressWarnings({"unchecked", "rawtypes"})
+                List<Map<String, Object>> bookmarks = SimpleBookmark.getBookmark(reader);
+                if (bookmarks != null) {
+                    if (pageOffset != 0) {
+                        SimpleBookmark.shiftPageNumbers(bookmarks, pageOffset, null);
+                    }
+                    master.addAll(bookmarks);
+                }
+                pageOffset += pdfPages;
+                log.info("There are {} pages in {}", pdfPages, pdfFile.getPath());
+                // init when first file
+                if (0 == fileIndex) {
+                    // step 1: creation of a document-object
+                    document = new Document(reader.getPageSizeWithRotation(1));
+                    // step 2: we create a writer that listens to the document
+                    writer = new PdfCopy(document, new FileOutputStream(outFilePath));
+                    // step 3: we open the document
+                    document.open();
+                }
+                // step 4: we add content
+                PdfImportedPage page;
+                for (int i = 1; i <= pdfPages; i++) {
+                    page = writer.getImportedPage(reader, i);
+                    writer.addPage(page);
+                    log.info("Processed {} page {}", pdfFile.getName(), i);
+                }
+                writer.freeReader(reader);
+            }
+            if (!master.isEmpty() && Objects.nonNull(writer)) {
+                writer.setOutlines(master);
+            }
+            log.info("Merge Successfully {}", outFilePath);
+            return true;
+        } catch (Exception e) {
+            log.error("PdfUtils.mergePdf Exception:{}\n{}", e.getMessage(), e);
+        } finally {
+            // step 5: we close the document
+            if (Objects.nonNull(document)) {
+                document.close();
+            }
+        }
+        log.info("Merge failed");
         return false;
     }
 }
