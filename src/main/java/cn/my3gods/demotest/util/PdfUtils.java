@@ -4,9 +4,11 @@ import cn.my3gods.demotest.enums.FontEnum;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfCopy;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.SimpleBookmark;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -171,6 +173,13 @@ public class PdfUtils {
         return true;
     }
 
+    /**
+     * 合并PDF文件（参考itext2.1.7源码
+     *
+     * @param fileList 合并的文件路径集合
+     * @param outFilePath 新文件的路径
+     * @return 合并结果true - 成功
+     */
     public static boolean mergePdf(List<File> fileList, String outFilePath) {
         Document document = null;
         try {
@@ -226,6 +235,115 @@ public class PdfUtils {
             }
         }
         log.info("Merge failed");
+        return false;
+    }
+
+    /**
+     * 分割PDF为两个
+     *
+     * @param originFilePath 原PDF文件路径
+     * @param upperPartPath 导出的前半部分PDF
+     * @param latterPartPath 导出的后半部分PDF
+     * @param splitPage 分割处页面页码，包含在第二部分
+     * @return 分割结果 true - 成功
+     */
+    public static boolean splitPdf(String originFilePath, String upperPartPath, String latterPartPath, int splitPage) {
+        try {
+            // we create a reader for a certain document
+            PdfReader reader = new PdfReader(originFilePath);
+            // we retrieve the total number of pages
+            int totalPage = reader.getNumberOfPages();
+
+            log.info("There are {} pages in the original file:{}", totalPage, originFilePath);
+
+            if (splitPage < 2) {
+                splitPage = 2;
+            } else if (splitPage > totalPage) {
+                splitPage = totalPage;
+            }
+
+            // the upper part origin pdf 1 to (splitPage - 1): subPdfFromOrigin(reader, upperPartPath, 1, splitPage - 1)
+
+            // the latter part of origin pdf splitPage to totalPage: subPdfFromOrigin(reader, latterPartPath, splitPage, totalPage)
+
+            return subPdfFromOrigin(reader, upperPartPath, 1, splitPage - 1) && subPdfFromOrigin(reader, latterPartPath, splitPage, totalPage);
+        } catch (Exception e) {
+            log.error("PdfUtils.splitPdf Exception:{}\n{}", e.getMessage(), e);
+        }
+        return false;
+    }
+
+    /**
+     * 从PDF中截取某一部分页的PDF
+     *
+     * @param originReader 原PDF的new PdfReader(originFilePath)对象
+     * @param outPath 导出的PDF文件路径
+     * @param startPage 截取开始的页
+     * @param endPage 截取结束的页（包含此页
+     * @return 截取导出结果 true - 成功
+     */
+    public static boolean subPdfFromOrigin(PdfReader originReader, String outPath, int startPage, int endPage) {
+        // step 1: creation of a document-object
+        Document doc = null;
+        try {
+            doc = new Document(originReader.getPageSizeWithRotation(startPage));
+            // step 2: we create a writer that listens to the document
+            PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(outPath));
+            // step 3: we open the document
+            doc.open();
+            PdfContentByte contentByte = writer.getDirectContent();
+            // step 4: we add content
+            for (int i = startPage; i <= endPage; i++) {
+                doc.setPageSize(originReader.getPageSizeWithRotation(i));
+                doc.newPage();
+                PdfImportedPage page = writer.getImportedPage(originReader, i);
+                int rotation = originReader.getPageRotation(i);
+                if (rotation == 90 || rotation == 270) {
+                    contentByte.addTemplate(page, 0, -1f, 1f, 0, 0, originReader.getPageSizeWithRotation(i).getHeight());
+                } else {
+                    contentByte.addTemplate(page, 1f, 0, 0, 1f, 0, 0);
+                }
+                log.info("Processed page {} to {}", i, outPath);
+            }
+            return true;
+        } catch (FileNotFoundException | DocumentException e) {
+            log.error("PdfUtils.subPdfFromOrigin Exception:{}\n{}", e.getMessage(), e);
+        } finally {
+            if (Objects.nonNull(doc)) {
+                doc.close();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 截取PDF文件的一部分页
+     * @param srcPath 源文件地址
+     * @param outPath 导出文件地址
+     * @param startPage 开始页
+     * @param endPage 结束页（包含
+     * @return 截取结果 true - 成功
+     */
+    public static boolean subPdfFromOrigin(String srcPath, String outPath, int startPage, int endPage) {
+        try {
+            // we create a reader for a certain document
+            PdfReader reader = new PdfReader(srcPath);
+            // we retrieve the total number of pages
+            int totalPage = reader.getNumberOfPages();
+
+            log.info("There are {} pages in the original file:{}", totalPage, srcPath);
+
+            if (startPage < 1) {
+                startPage = 1;
+            }
+            if (endPage > totalPage) {
+                endPage = totalPage;
+            }
+
+            return subPdfFromOrigin(reader, outPath, startPage, endPage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 }
