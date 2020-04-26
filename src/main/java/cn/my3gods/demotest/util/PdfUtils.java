@@ -205,15 +205,14 @@ public class PdfUtils {
                     document.open();
                 }
                 // step 4: we add content
-                PdfImportedPage page;
                 for (int i = 1; i <= pdfPages; i++) {
-                    page = writer.getImportedPage(reader, i);
+                    PdfImportedPage page = writer.getImportedPage(reader, i);
                     writer.addPage(page);
                     log.info("Processed {} page {}", pdfFile.getName(), i);
                 }
                 writer.freeReader(reader);
             }
-            if (!master.isEmpty() && Objects.nonNull(writer)) {
+            if (Objects.nonNull(writer) && !master.isEmpty()) {
                 writer.setOutlines(master);
             }
             log.info("Merge Successfully {}", outFilePath);
