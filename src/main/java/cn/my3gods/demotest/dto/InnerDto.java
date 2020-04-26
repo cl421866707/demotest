@@ -12,6 +12,8 @@ import lombok.Data;
 public class InnerDto {
 
     @NotBlank(message = "paramStr can not be blank")
+//    @JsonProperty("param_str")
+//    @JsonAlias("param_str")
     private String paramStr;
 
     @NotNull(message = "paramBool can not be null")
