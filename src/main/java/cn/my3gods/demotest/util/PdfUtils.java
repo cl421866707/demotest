@@ -30,50 +30,30 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 @Slf4j
 public class PdfUtils {
 
-    // thymeleaf模板所需参数 key - 模板里取值所用名称 value - 对应对象值
-    private Map<String, Object> htmlVariableMap;
-
-    // html模板在resource里template文件下的相对路径
-    private String templatePath;
-
     @Resource
     private SpringTemplateEngine springTemplateEngine;
-
-    private PdfUtils(Map<String, Object> htmlVariableMap, String templatePath) {
-        this.htmlVariableMap = htmlVariableMap;
-        this.templatePath = templatePath;
-    }
 
     /**
      * 传入生成HTML模板
      *
-     * @return 处理后的html
+     * @param templatePath html模板在resource里template文件下的相对路径
+     * @param htmlVariableMap thymeleaf模板所需参数 key - 模板里取值所用名称 value - 对应对象值
+     * @return 处理后的HTML字符串
      */
-    public String processHtmlTemplate() {
-        return springTemplateEngine.process(templatePath, new Context(null, htmlVariableMap));
-    }
-
-    /**
-     * 返回工具类对象
-     *
-     * @param htmlVariableMap 变量名 - 变量参数 的Map集合
-     * @param templatePath resource里template文件下的相对路径
-     * @return PdfUtils
-     */
-    public static PdfUtils build(Map<String, Object> htmlVariableMap, String templatePath) {
-        return new PdfUtils(htmlVariableMap, templatePath);
+    public static String processHtmlTemplate(String templatePath, Map<String, Object> htmlVariableMap) {
+        return new PdfUtils().springTemplateEngine.process(templatePath, new Context(null, htmlVariableMap));
     }
 
     /**
      * 生成PDF文件
      *
-     * @param htmlVariableMap HTML模板所需参数
      * @param templatePath 模板路径
+     * @param htmlVariableMap HTML模板所需参数
      * @param savePath 导出的PDF文件路径
      * @return 生成结果
      */
-    public static boolean createPdfByHtml(Map<String, Object> htmlVariableMap, String templatePath, String savePath) {
-        String html = build(htmlVariableMap, templatePath).processHtmlTemplate();
+    public static boolean createPdfByHtml(String templatePath, Map<String, Object> htmlVariableMap, String savePath) {
+        String html = processHtmlTemplate(templatePath, htmlVariableMap);
         if (StringUtils.isBlank(html)) {
             log.error("PdfUtils.createPdfByHtml empty html string!");
             return false;
@@ -84,14 +64,14 @@ public class PdfUtils {
     /**
      * 生成包含指定字体的PDF文件
      *
-     * @param htmlVariableMap HTML模板所需参数
      * @param templatePath 模板路径
+     * @param htmlVariableMap HTML模板所需参数
      * @param savePath 导出的PDF文件路径
      * @param fontPath 字体文件路径
      * @return 生成结果
      */
-    public static boolean createPdfByHtml(Map<String, Object> htmlVariableMap, String templatePath, String savePath, String fontPath) {
-        String html = build(htmlVariableMap, templatePath).processHtmlTemplate();
+    public static boolean createPdfByHtml(String templatePath, Map<String, Object> htmlVariableMap, String savePath, String fontPath) {
+        String html = processHtmlTemplate(templatePath, htmlVariableMap);
         if (StringUtils.isBlank(html)) {
             log.error("PdfUtils.createPdfByHtml empty html string!");
             return false;
@@ -147,6 +127,7 @@ public class PdfUtils {
      * @param savePath 合并成的文件路径
      * @return 成功 - true
      */
+    @Deprecated
     public static boolean mergePdfV1(List<File> fileList, String savePath) {
         Document document = null;
         try {
@@ -318,6 +299,7 @@ public class PdfUtils {
 
     /**
      * 截取PDF文件的一部分页
+     *
      * @param srcPath 源文件地址
      * @param outPath 导出文件地址
      * @param startPage 开始页
