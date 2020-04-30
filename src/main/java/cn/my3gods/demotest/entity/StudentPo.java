@@ -1,8 +1,7 @@
 package cn.my3gods.demotest.entity;
 
-import cn.my3gods.demotest.util.JsonUtils;
+import cn.my3gods.demotest.util.JacksonUtils;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.MoreObjects;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,8 +22,8 @@ public class StudentPo {
     @Override
     public String toString() {
         try {
-            return JsonUtils.object2Json(this);
-        } catch (JsonProcessingException e) {
+            return JacksonUtils.obj2Json(this);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return MoreObjects.toStringHelper(this)

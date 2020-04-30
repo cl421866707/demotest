@@ -4,7 +4,7 @@ import cn.my3gods.demotest.dto.CommonResponse;
 import cn.my3gods.demotest.excel.listener.DataListener;
 import cn.my3gods.demotest.excel.model.DemoData;
 import cn.my3gods.demotest.excel.model.StudentData;
-import cn.my3gods.demotest.util.JsonUtils;
+import cn.my3gods.demotest.util.JacksonUtils;
 import com.alibaba.excel.EasyExcel;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -73,7 +73,7 @@ public class ExcelController {
             Map<String, String> map = new HashMap<>();
             map.put("status", "failure");
             map.put("message", "下载文件失败" + e.getMessage());
-            response.getWriter().println(JsonUtils.object2Json(map));
+            response.getWriter().println(JacksonUtils.obj2Json(map));
         }
     }
 

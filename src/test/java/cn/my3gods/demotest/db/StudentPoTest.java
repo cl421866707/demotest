@@ -9,8 +9,7 @@ import cn.my3gods.demotest.mapper.CityMapper;
 import cn.my3gods.demotest.mapper.StudentEntityMapper;
 import cn.my3gods.demotest.mapper.StudentMapper;
 import cn.my3gods.demotest.util.BeanUtils;
-import cn.my3gods.demotest.util.JsonUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import cn.my3gods.demotest.util.JacksonUtils;
 import java.util.Objects;
 import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
@@ -29,17 +28,17 @@ public class StudentPoTest {
     private StudentEntityMapper studentEntityMapper;
 
     @Test
-    public void test() throws JsonProcessingException {
+    public void test() {
         StudentPo studentPo = studentMapper.selectById(1);
         CityPo cityPo = cityMapper.selectById(studentPo.getCityId());
         StudentDto studentDto = Objects.requireNonNull(BeanUtils.copyProperties2Bean(studentPo, StudentDto.class));
         studentDto.setCity(BeanUtils.copyProperties2Bean(cityPo, CityDto.class));
-        String json = JsonUtils.object2Json(studentDto);
+        String json = JacksonUtils.obj2Json(studentDto);
         System.err.println(json);
     }
 
     @Test
-    public void testCascade() throws JsonProcessingException {
+    public void testCascade() {
         StudentEntity studentEntity = studentEntityMapper.selectEagerCascade((long) 1);
         System.err.println(studentEntity);
         CityPo cityPo = studentEntity.getCityPo();
