@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * <br>基本查询实体</br>
@@ -27,4 +28,10 @@ public class BcBaseQo {
 
     // 每页数据量
     private Integer limit;
+
+    // 包含的字段
+    private String include_fields;
+
+    // 排除的字段
+    private String exclude_fields;
 }
