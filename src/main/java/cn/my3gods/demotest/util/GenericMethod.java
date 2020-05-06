@@ -22,6 +22,13 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public class GenericMethod {
 
+    public static BcResponseDataV3 parseResponseData(String json) {
+        if (StringUtils.isBlank(json)) {
+            return null;
+        }
+        return JacksonUtils.json2Obj(json, BcResponseDataV3.class);
+    }
+
     /**
      * 解析BigCommerce的响应数据，并获取所需的类型的data数据(根据结果类型推断要转换成什么类型数据)
      *

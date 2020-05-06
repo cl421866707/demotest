@@ -1,5 +1,6 @@
 package cn.my3gods.demotest.dto.bc;
 
+import java.util.Map;
 import lombok.Data;
 
 /**
@@ -15,6 +16,6 @@ public class BcResponseDataV3<T> {
     // 数据主体，多个时为JSON数组，单个为对象
     private T data;
 
-    // 分页信息，查询多个时BigCommerce会返回，单个则为空
-    private Object meta;
+    // 分页信息，查询多个时BigCommerce会返回，单个则为空:"pagination" - BcPagination
+    private Map<String, BcPagination> meta;
 }

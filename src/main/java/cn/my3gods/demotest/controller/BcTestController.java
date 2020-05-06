@@ -1,6 +1,7 @@
 package cn.my3gods.demotest.controller;
 
 import cn.my3gods.demotest.constants.BcCatalogModeConstant;
+import cn.my3gods.demotest.dto.BaseResponseDto;
 import cn.my3gods.demotest.dto.bc.BcBaseQo;
 import cn.my3gods.demotest.dto.bc.brand.BcBrandDto;
 import cn.my3gods.demotest.dto.bc.product.BcProductDto;
@@ -8,11 +9,14 @@ import cn.my3gods.demotest.util.GenericMethod;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,11 +50,7 @@ public class BcTestController {
      * @return 完整URL路径
      */
     private String getBaseUrl(String targetMode) {
-        if (Objects.nonNull(baseUrl)) {
-            return baseUrl;
-        }
-        baseUrl = bigCommerceBaseUrl + "/" + BcCatalogModeConstant.STORE_HASH + "/" + targetMode;
-        return baseUrl;
+        return bigCommerceBaseUrl + "/" + BcCatalogModeConstant.STORE_HASH + "/" + targetMode;
     }
 
 //    @GetMapping("brands")
@@ -68,58 +68,75 @@ public class BcTestController {
 //    }
 
     @GetMapping("brands")
-    public List<BcBrandDto> getBrandsByCondition(BcBaseQo baseQo) throws IllegalAccessException {
+    public BaseResponseDto<List<BcBrandDto>> getBrandsByCondition(BcBaseQo baseQo) throws IllegalAccessException {
         log.debug("URI参数：{}", baseQo);
         String url = GenericMethod.addUrlParams(getBaseUrl(BcCatalogModeConstant.BRAND), baseQo);
         log.debug("请求URL：{}", url);
 
-        String result = bcRestTemplate.getForObject(url, String.class, baseQo);
+        String result = this.get(url);
         log.debug("请求结果：{}", result);
+        if (StringUtils.isBlank(result)) {
+            return BaseResponseDto.fail("request failed url:" + url);
+        }
         List<BcBrandDto> bcBrandDtos = GenericMethod.parseResponseData(result, new TypeReference<List<BcBrandDto>>() {
         });
         if (CollectionUtils.isNotEmpty(bcBrandDtos)) {
             bcBrandDtos.forEach(System.err::println);
         }
-        return bcBrandDtos;
+        return BaseResponseDto.success(bcBrandDtos);
     }
 
     @GetMapping("brands/{brandId}")
-    public BcBrandDto getBrandById(@PathVariable String brandId, BcBaseQo baseQo) throws IllegalAccessException {
+    public BaseResponseDto<BcBrandDto> getBrandById(@PathVariable String brandId, BcBaseQo baseQo) throws IllegalAccessException {
         log.debug("URI参数：{}", baseQo);
         String url = GenericMethod.addPathVariableAndUrlParams(getBaseUrl(BcCatalogModeConstant.BRAND), Collections.singletonList(brandId), baseQo);
-        log.debug("请求URL：{}", url);
-
-        String result = bcRestTemplate.getForObject(url, String.class, baseQo);
+        String result = this.get(url);
         log.debug("请求结果：{}", result);
+        if (StringUtils.isBlank(result)) {
+            return BaseResponseDto.fail("request failed url:" + url);
+        }
         BcBrandDto bcBrandDto = GenericMethod.parseResponseData(result, new TypeReference<BcBrandDto>() {
         });
-        return bcBrandDto;
+        return BaseResponseDto.success(bcBrandDto);
     }
 
     @GetMapping("products")
-    public List<BcProductDto> getProductsByCondition(BcBaseQo baseQo) throws IllegalAccessException {
+    public BaseResponseDto<List<BcProductDto>> getProductsByCondition(BcBaseQo baseQo) throws IllegalAccessException {
         String url = GenericMethod.addUrlParams(getBaseUrl(BcCatalogModeConstant.PRODUCT), baseQo);
-        log.debug("请求URL：{}", url);
-        String result = bcRestTemplate.getForObject(url, String.class);
+        String result = this.get(url);
         log.debug("请求结果：{}", result);
+        if (StringUtils.isBlank(result)) {
+            return BaseResponseDto.fail("request failed url:" + url);
+        }
         List<BcProductDto> bcProductDtos = GenericMethod.parseResponseData(result, new TypeReference<List<BcProductDto>>() {
         });
         if (CollectionUtils.isNotEmpty(bcProductDtos)) {
             bcProductDtos.forEach(System.err::println);
         }
-        return bcProductDtos;
+        return BaseResponseDto.success(bcProductDtos);
     }
 
     @GetMapping("products/{productId}")
-    public BcProductDto getProductById(@PathVariable String productId, BcBaseQo baseQo) throws IllegalAccessException {
+    public BaseResponseDto<BcProductDto> getProductById(@PathVariable String productId, BcBaseQo baseQo) throws IllegalAccessException {
         log.debug("URI参数：{}", baseQo);
-        String url = GenericMethod.addPathVariableAndUrlParams(getBaseUrl(BcCatalogModeConstant.BRAND), Collections.singletonList(productId), baseQo);
-        log.debug("请求URL：{}", url);
-
-        String result = bcRestTemplate.getForObject(url, String.class, baseQo);
+        String url = GenericMethod.addPathVariableAndUrlParams(getBaseUrl(BcCatalogModeConstant.PRODUCT), Collections.singletonList(productId), baseQo);
+        String result = this.get(url);
         log.debug("请求结果：{}", result);
+        if (StringUtils.isBlank(result)) {
+            return BaseResponseDto.fail("request failed url:" + url);
+        }
         BcProductDto bcProductDto = GenericMethod.parseResponseData(result, new TypeReference<BcProductDto>() {
         });
-        return bcProductDto;
+        return BaseResponseDto.success(bcProductDto);
+    }
+
+    private String get(String url) {
+        log.debug("请求URL：{}", url);
+        ResponseEntity<String> responseEntity = this.bcRestTemplate.getForEntity(url, String.class);
+        HttpHeaders headers = responseEntity.getHeaders();
+        HttpStatus statusCode = responseEntity.getStatusCode();
+        log.info("get http headers:{}", headers);
+        log.info("get http status:{}", statusCode);
+        return statusCode.is2xxSuccessful() ? responseEntity.getBody() : null;
     }
 }
