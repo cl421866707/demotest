@@ -38,8 +38,6 @@ public class BcTestController {
     @Value("${bigcommerce.api.url:https://api.bigcommerce.com/stores}")
     private String bigCommerceBaseUrl = "https://api.bigcommerce.com/stores";
 
-    private String baseUrl;
-
     @Resource(name = "bcRestTemplate")
     private RestTemplate bcRestTemplate;
 
@@ -52,20 +50,6 @@ public class BcTestController {
     private String getBaseUrl(String targetMode) {
         return bigCommerceBaseUrl + "/" + BcCatalogModeConstant.STORE_HASH + "/" + targetMode;
     }
-
-//    @GetMapping("brands")
-//    public List<BcBrandDto> getBrandsWithoutCondition() {
-//        String finalUrl = getBaseUrl(BcCatalogModeConstant.BRAND);
-//        log.debug("请求URL：{}", finalUrl);
-//        String result = bcRestTemplate.getForObject(finalUrl, String.class);
-//        log.debug("请求结果：{}", result);
-//        List<BcBrandDto> bcBrandDtos = GenericMethod.parseResponseData(result, new TypeReference<List<BcBrandDto>>() {
-//        });
-//        if (CollectionUtils.isNotEmpty(bcBrandDtos)) {
-//            bcBrandDtos.forEach(System.err::println);
-//        }
-//        return bcBrandDtos;
-//    }
 
     @GetMapping("brands")
     public BaseResponseDto<List<BcBrandDto>> getBrandsByCondition(BcBaseQo baseQo) throws IllegalAccessException {
