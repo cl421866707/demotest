@@ -19,7 +19,7 @@ public class MyPwdUtils {
         String pwd = args[0];
         for (int i = 0; i < 3; i++) {
             pwd = Md5Utils.md5For16(pwd, "cl");
-            System.err.println("index:" + i + ";result:" + pwd + "\n");
+            System.err.println("index:" + (i + 1) + ";result:" + pwd + "\n");
         }
     }
 }
