@@ -8,11 +8,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 /**
- * 测试方法 输入需要测试的个数 例如输入10000 然后会对此进行测试10次，去掉时间最小的，和一个时间最大的，剩下的8次再来求平均值 得到的就是我们所要求得平均速度 这里我们需要测试10个数据 1000个数据 10万个数据 Created by lz on 2016/7/24.
+ * 测试方法 输入需要测试的个数 例如输入10000 然后会对此进行测试10次，
+ * 去掉时间最小的，和一个时间最大的，剩下的8次再来求平均值 得到的就是我们所要求得平均速度
+ * 这里我们需要测试10个数据 1000个数据 10万个数据
  */
 public class JsonTest {
 
@@ -126,15 +127,15 @@ public class JsonTest {
         //输入测试个数，得到时间
         List<Double> list10 = complete(10);
         List<Double> list1000 = complete(1000);
-//        List<Double> list100000 = complete(100000);
+        List<Double> list100000 = complete(100000);
         System.out.println("------------------------序列化时间比较----------------------------");
         System.out.println("测试数据为10的时候:jackson序列化时间:" + list10.get(0) + "ms | fastjson序列化时间" + list10.get(1) + "ms");
         System.out.println("测试数据为1000的时候:jackson序列化时间:" + list1000.get(0) + "ms | fastjson序列化时间" + list1000.get(1) + "ms");
-//        System.out.println("测试数据为100000的时候:jackson序列化时间:" + list100000.get(0) + "ms | fastjson序列化时间" + list100000.get(1) + "ms");
+        System.out.println("测试数据为100000的时候:jackson序列化时间:" + list100000.get(0) + "ms | fastjson序列化时间" + list100000.get(1) + "ms");
         System.out.println("------------------------反序列化时间比较----------------------------");
         System.out.println("测试数据为10的时候:jackson反序列化时间:" + list10.get(2) + "ms | fastjson反序列化时间" + list10.get(3) + "ms");
         System.out.println("测试数据为1000的时候:jackson反序列化时间:" + list1000.get(2) + "ms | fastjson反序列化时间" + list1000.get(3) + "ms");
-//        System.out.println("测试数据为100000的时候:jackson反序列化时间:" + list100000.get(2) + "ms | fastjson反序列化时间" + list100000.get(3) + "ms");
+        System.out.println("测试数据为100000的时候:jackson反序列化时间:" + list100000.get(2) + "ms | fastjson反序列化时间" + list100000.get(3) + "ms");
     }
 
     @Test

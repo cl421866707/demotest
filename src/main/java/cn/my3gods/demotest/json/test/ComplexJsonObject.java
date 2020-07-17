@@ -1,6 +1,5 @@
 package cn.my3gods.demotest.json.test;
 
-import cn.my3gods.demotest.model.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.MoreObjects;
 import java.io.Serializable;
